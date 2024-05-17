@@ -1,3 +1,2 @@
 streamlit
-mysqlclient
-SQLAlchemy
+google-cloud
