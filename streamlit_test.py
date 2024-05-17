@@ -1,27 +1,15 @@
-
-import time
 import streamlit as st
-# st.set_page_config(layout="wide")
-import numpy as np
-import pandas as pd
-from FinMind.data import DataLoader
-import ta
-from ta.utils import dropna
-import mysql.connector
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-import mplfinance as mpf
-import plotly.graph_objects as go
-import os
-import json
-import random
-import plotly.express as px
+from google.cloud import firestore
 
+# Authenticate to Firestore with the JSON account key.
+db = firestore.Client.from_service_account_json("testing.json")
 
-import streamlit as st
+# Create a reference to the Google post.
+doc_ref = db.collection("posts").document("Google")
 
-# Initialize connection.
-conn = st.connection('mysql', type='sql')
+# Then get the data at that reference.
+doc = doc_ref.get()
 
-# Perform query.
-df = conn.query('SELECT * from s0050;', ttl=600)
+# Let's see what we got!
+st.write("The id is: ", doc.id)
+st.write("The contents are: ", doc.to_dict())
