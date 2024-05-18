@@ -70,14 +70,14 @@ def FilterDate(candle_data, code):
 tab_graph, tab_dollar_cost_averaging, tab_random_strategy = st.tabs(["個股走勢", "定期定額實驗", "隨機選股實驗"])
 
 with tab_graph:
-    stock_id_l = FetchDatasetList()
+    stock_id_l = FetchDatasetList("test")
 
     option = st.selectbox(
         "Stock List",
         stock_id_l
     )
 
-    data = FetchData(option)
+    data = FetchData("test", option)
     data = CleanData(data)
     candle_data_all = PrepareData(data)
     close_days = ExtractMarketCloseDate(candle_data_all)
