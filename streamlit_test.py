@@ -3,7 +3,6 @@ import numpy as np
 from google.cloud import firestore
 import json
 from datetime import datetime
-import os
 import streamlit as st
 from datetime import datetime, timedelta
 import plotly.graph_objects as go
