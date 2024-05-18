@@ -6,7 +6,7 @@ import pandas as pd
 db = firestore.Client.from_service_account_json("testing.json")
 
 # Create a reference to the Google post.
-doc_ref = db.collection("test").document("stock_id_123")
+doc_ref = db.collection("test").document("stock_id_2")
 
 # Then get the data at that reference.
 doc = doc_ref.get()
