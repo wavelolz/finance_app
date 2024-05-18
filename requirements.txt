@@ -1,4 +1,8 @@
-streamlit
-google-cloud-firestore
-numpy 
 pandas
+numpy
+google-cloud-firestore
+jsonlib-python3
+datetime
+os
+streamlit
+plotly
