@@ -6,18 +6,13 @@ from datetime import datetime
 import streamlit as st
 from datetime import datetime, timedelta
 import plotly.graph_objects as go
+import time
 
 
 db = firestore.Client.from_service_account_json("testing.json")
 
-def upload_to_firestore(data, doc_id):
-    doc_ref = db.collection('test').document(doc_id)
-    doc_ref.set({'data': data})
 
-def delete_document(collection_name, doc_id):
-    doc_ref = db.collection(collection_name).document(doc_id)
-    doc_ref.delete()
-
+@st.cache_data
 def FetchDatasetList(collection_name):
     collection_ref = db.collection(collection_name)
     docs = collection_ref.stream()
@@ -26,22 +21,23 @@ def FetchDatasetList(collection_name):
         stock_ids.append(doc.id)
     return stock_ids
 
+@st.cache_data
 def FetchData(collection_name, stock_id):
     doc_ref = db.collection(collection_name).document(stock_id)
     doc = doc_ref.get()
-    data = doc.to_dict()["data"]
-    df = pd.DataFrame(data)
+    data = doc.to_dict()
+    data = {k: data[k] for k in sorted(data)}
+    df = pd.DataFrame.from_dict(data, orient="index")
+    df.reset_index(inplace=True)
+    df.rename(columns={"index" : "date"}, inplace=True)
     return df
 
+@st.cache_data
 def CleanData(data):
     filter_data = data.loc[data["close"] != 0]
     return filter_data
 
-def PrepareData(data):
-    candle = data[["date", "Trading_Volume", "open", "close", "max", "min"]]
-    candle.columns = ["date", "volume", "open", "close", "high", "low"]
-    return candle
-
+@st.cache_data
 def ExtractMarketCloseDate(data):
     date_l = data["date"].to_list()
     start_date = datetime.strptime(date_l[0], "%Y-%m-%d")
@@ -70,17 +66,16 @@ def FilterDate(candle_data, code):
 tab_graph, tab_dollar_cost_averaging, tab_random_strategy = st.tabs(["個股走勢", "定期定額實驗", "隨機選股實驗"])
 
 with tab_graph:
-    stock_id_l = FetchDatasetList("test")
+    stock_id_l = FetchDatasetList("test2")
 
     option = st.selectbox(
         "Stock List",
         stock_id_l
     )
 
-    data = FetchData("test", option)
-    data = CleanData(data)
-    candle_data_all = PrepareData(data)
-    close_days = ExtractMarketCloseDate(candle_data_all)
+    data = FetchData("test2", option)
+    data_all = CleanData(data)
+    close_days = ExtractMarketCloseDate(data_all)
     
 
     
@@ -91,27 +86,25 @@ with tab_graph:
         )
 
     if genre_duration == '1月':
-        candle_data_part = FilterDate(candle_data_all, 0)
+        data_part = FilterDate(data_all, 0)
     elif genre_duration == '3月':
-        candle_data_part = FilterDate(candle_data_all, 1)
+        data_part = FilterDate(data_all, 1)
     elif genre_duration == '5月':
-        candle_data_part = FilterDate(candle_data_all, 2)
+        data_part = FilterDate(data_all, 2)
     elif genre_duration == '1年':
-        candle_data_part = FilterDate(candle_data_all, 3)
+        data_part = FilterDate(data_all, 3)
     elif genre_duration == '5年':
-        candle_data_part = FilterDate(candle_data_all, 4)
+        data_part = FilterDate(data_all, 4)
     else:
-        candle_data_part = FilterDate(candle_data_all, 5)
+        data_part = FilterDate(data_all, 5)
 
-
-    candle = go.Candlestick(
-        x=candle_data_part["date"], 
-        open=candle_data_part["open"], 
-        high=candle_data_part["high"], 
-        low=candle_data_part["low"], 
-        close=candle_data_part["close"]
-        )
-
-    fig = go.Figure(data=candle)
+    line = go.Scatter(
+        x=data_part["date"],
+        y=data_part["close"],
+        mode="lines"
+    )
+    fig = go.Figure()
+    fig.add_trace(line)
+    
     fig.update_xaxes(rangebreaks=[dict(values=close_days)])
     st.plotly_chart(fig, use_container_width=True)
