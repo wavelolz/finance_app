@@ -1,7 +1,5 @@
-pandas
-numpy
-google-cloud-firestore
-jsonlib-python3
-datetime
-streamlit
-plotly
+streamlit==1.31.1
+plotly==5.20.0
+numpy==1.26.3
+google-cloud-firestore==2.16.0
+pandas==2.1.4
