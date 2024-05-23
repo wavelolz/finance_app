@@ -16,6 +16,7 @@ import plotly.express as px
 import os
 
 key_path = st.secrets["firebase"]["settings"]
+print(key_path)
 
 
 def FilterDate(candle_data, code):
