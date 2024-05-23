@@ -15,7 +15,7 @@ import random
 import plotly.express as px
 import os
 
-key_path = st.secrets["firebase"]
+key_path = st.secrets["firebase"]["settings"]
 
 
 def FilterDate(candle_data, code):
