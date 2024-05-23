@@ -4,8 +4,8 @@ import pandas as pd
 from google.cloud import firestore
 
 @st.cache_data
-def FetchDatasetList(collection_name, key_path):
-    db = firestore.Client.from_service_account_json(key_path)
+def FetchDatasetList(collection_name, _key_path):
+    db = firestore.Client.from_service_account_json(_key_path)
     collection_ref = db.collection(collection_name)
     docs = collection_ref.stream()
     stock_ids = []
@@ -15,8 +15,8 @@ def FetchDatasetList(collection_name, key_path):
     return stock_ids
 
 @st.cache_data
-def FetchData(collection_name, stock_id, key_path):
-    db = firestore.Client.from_service_account_json(key_path)
+def FetchData(collection_name, stock_id, _key_path):
+    db = firestore.Client.from_service_account_json(_key_path)
     doc_ref = db.collection(collection_name).document(stock_id)
     doc = doc_ref.get()
     data = doc.to_dict()
